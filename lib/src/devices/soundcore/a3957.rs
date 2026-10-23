@@ -64,6 +64,7 @@ soundcore_device!(
         builder.wearing_detection();
         builder.sound_leak_compensation();
         builder.a3957_gaming_mode();
+        builder.a3957_pressure_sensitivity();
 
         builder.tws_status();
         builder.dual_battery_custom(common::modules::dual_battery::DualBatteryConfiguration {
@@ -225,7 +226,7 @@ mod tests {
             (SettingId::DualConnections, true.into()),
             (SettingId::DolbyAudio, "Disabled".into()),
             (SettingId::InCallSoundAwareness, false.into()),
-            // (SettingId::EarbudPressureSensitivity, "Medium".into()),
+            (SettingId::PressureSensitivity, "Medium".into()),
         ]);
 
         device
@@ -235,6 +236,13 @@ mod tests {
                     packet::Command([6, 129]),
                     vec![0, 0x50, 1, 0, 0, 0, 0],
                 )],
+            )
+            .await;
+
+        device
+            .assert_set_settings_response(
+                vec![(SettingId::PressureSensitivity, "Firmest".into())],
+                vec![packet::Outbound::new(packet::Command([4, 133]), vec![2])],
             )
             .await;
     }
